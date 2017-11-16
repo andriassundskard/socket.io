@@ -4,6 +4,12 @@
 		<title>NodeJS</title>
 	</head>
 	<body>
+		<form>
+			<label for="firstname">Fistname</label>
+			<input type="text" id="firstname">
+			<label for="lastname">Lastname</label>
+			<input type="text" id="lastname">
+		</form>
 	</body>
 	<script src="/socket.io/socket.io.js"></script>
 	<script>
@@ -12,5 +18,13 @@
 			console.log(data);
 			socket.emit("my other event", { my: "data" });
 		});
+		function logFieldValue() {
+			socket.emit("key logger", { 
+				id: this.id,
+				value: this.value
+			});
+		}
+		document.getElementById("firstname").addEventListener("focusout", logFieldValue);
+		document.getElementById("lastname").addEventListener("focusout", logFieldValue);
 	</script>
 </html>
