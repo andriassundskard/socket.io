@@ -2,8 +2,12 @@
 <html>
 	<head>
 		<title>NodeJS</title>
+		<script src="/socket.io/socket.io.js"></script>
+		<script src="http://code.jquery.com/jquery-3.2.1.min.js"></script>
+		<script src="http://code.highcharts.com/highcharts.js"></script>
 	</head>
 	<body>
+		<div id="chart" style="width:100%; height:400px;"></div>
 		<form>
 			<label for="firstname">Fistname</label>
 			<input type="text" id="firstname">
@@ -11,19 +15,61 @@
 			<input type="text" id="lastname">
 		</form>
 	</body>
-	<script src="/socket.io/socket.io.js"></script>
 	<script>
 		var socket = io("http://localhost:8000");
-		socket.on("news", function (data) {
-			console.log(data);
-			socket.emit("my other event", { my: "data" });
+
+		var chart;
+		chart = new Highcharts.Chart({
+			chart: {
+				renderTo: 'chart', 
+				defaultSeriesType: 'spline',
+				events: {
+					load: function() {
+						// Each time you receive a value from the socket, I put it on the graph
+						socket.on('graph', function (time, data) {
+							console.log(data);
+							socket.emit("reply", { value: data });
+
+							var series = chart.series[0];
+							series.addPoint([time, data]);
+						});
+					}
+				}
+			},
+			rangeSelector : {
+				selected : 100
+			},
+			title: {
+				text: 'Random graph'
+			},
+			xAxis: {
+				type: 'datetime',
+				tickPixelInterval: 150,
+				maxZoom: 20 * 1000
+			},
+			yAxis: {
+				min: 0,
+				max: 100,
+				minPadding: 0.2,
+				maxPadding: 0.2,
+				title: {
+					text: 'Value',
+					margin: 80
+				}
+			},
+			series: [{
+				name: 'Random',
+				data: []
+			}]
 		});
+
 		function logFieldValue() {
 			socket.emit("key logger", { 
 				id: this.id,
 				value: this.value
 			});
 		}
+
 		document.getElementById("firstname").addEventListener("focusout", logFieldValue);
 		document.getElementById("lastname").addEventListener("focusout", logFieldValue);
 	</script>

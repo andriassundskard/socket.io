@@ -1,6 +1,6 @@
 ﻿var 	app = require("http").createServer(handler),
 	io = require("socket.io")(app),
-	fs = require("fs")
+	fs = require("fs");
 
 const port = 8000;
 app.listen(port);
@@ -20,11 +20,19 @@ function handler(req, res) {
 	});
 }
 
+var dateUTC = new Date().getTime();
+var randomValue = Math.floor(Math.random() * 100);
+
+setInterval(function(){
+	dateUTC = new Date().getTime();
+	randomValue = Math.floor(Math.random() * 100);
+}, 5000);
+
 io.on("connection", function(socket) {
 	setInterval(function(){
-		socket.emit("news", { hello: "world" });
-	}, 5000);
-	socket.on("my other event", function (data) {
+		socket.emit("graph", dateUTC, randomValue);
+	}, 1000);
+	socket.on("reply", function (data) {
 		console.log(data);
 	});
 	socket.on("key logger", function(data) {
