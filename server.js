@@ -31,7 +31,7 @@ setInterval(function(){
 io.on("connection", function(socket) {
 	setInterval(function(){
 		socket.emit("graph", dateUTC, randomValue);
-	}, 1000);
+	}, 2000);
 	socket.on("reply", function (data) {
 		console.log(data);
 	});
